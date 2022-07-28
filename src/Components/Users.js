@@ -12,8 +12,8 @@ import {
 } from "react-bootstrap";
 export default function Users() {
   const queryClient = new QueryClient();
-  const { isLoading, error, data } = useQuery(["repoData"], () =>
-    axios.get("https://www.mecallapi.com/api/users").then((res) => res.data)
+  const { isLoading, error, data } = useQuery(["repoData"], async () =>
+    await axios.get("https://www.mecallapi.com/api/users").then((res) => res.data)
   );
 
   let getDetail = async (id) => {
@@ -28,7 +28,9 @@ export default function Users() {
     handleShow();
   };
   const [show, setShow] = useState(false);
+  const [show1, setShow1] = useState(false);
   const handleClose = () => setShow(false);
+  const handleClose1 = () => setShow1(false);
   const handleShow = () => setShow(true);
 
   const [fname, setFname] = useState("");
@@ -37,26 +39,28 @@ export default function Users() {
   const [email, setEmail] = useState("");
   const [modal, setModal] = useState("New");
   const [updateId, setUpdateId] = useState();
+  const [updateModal, setUpdateModal] = useState("Created");
 
   //for updating or deleting we use useMutation
   const deleteItem = useMutation(
-    (id) =>
-      axios.delete("https://www.mecallapi.com/api/users/delete/", {
+    async (id) =>
+      await axios.delete("https://www.mecallapi.com/api/users/delete/", {
         data: {
           id: id,
         },
       }),
     {
       onSuccess: () => {
-        alert("deleted");
+        setUpdateModal("deleted")
+        setShow1(true);
         queryClient.invalidateQueries(["repoData"]);
       },
     }
   );
 
   let createUser = useMutation(
-    () =>
-      axios
+    async () =>
+      await axios
         .post("https://www.mecallapi.com/api/users/create", {
           fname: fname,
           lname: lname,
@@ -70,17 +74,17 @@ export default function Users() {
         }),
     {
       onSuccess: () => {
-        alert("user created successfully!!");
+        setUpdateModal("created")
+        setShow1(true)
         handleClose();
-
         queryClient.invalidateQueries(["repoData"]);
       },
     }
   );
 
   let updateUser = useMutation(
-    (id) =>
-      axios.put(`https://www.mecallapi.com/api/users/update`, {
+    async (id) =>
+      await axios.put(`https://www.mecallapi.com/api/users/update`, {
         id: id,
         fname: fname,
         lname: lname,
@@ -89,14 +93,15 @@ export default function Users() {
       }),
     {
       onSuccess: () => {
-        alert("user updated successfully!!");
+        setUpdateModal("updated")
+        setShow1(true)
         handleClose();
         queryClient.invalidateQueries(["repoData"]);
       },
     }
   );
 
-  if (isLoading) return "Loading...";
+  if (isLoading) return <h3 style={{textAlign: "center"}}>Loading...</h3>;
 
   if (error) return "An error has occurred: " + error.message;
   return (
@@ -202,13 +207,12 @@ export default function Users() {
         )}
       </Modal>
       <Container>
-        <Row>
+        <Row className="justify-content-start">
           {data.map((data) => {
             return (
-              <Col sm className="my-2" key={data.id}>
+              <Col sm="4" className="my-2" key={data.id}>
                 <Card
                   style={{
-                    width: "18rem",
                     border: "none",
                     backgroundColor: "#d3dbe8",
                   }}
@@ -219,7 +223,7 @@ export default function Users() {
                       {data.fname} {data.lname}
                     </Card.Title>
                     <Card.Text>{data.username}</Card.Text>
-                    <Button
+                    <Button size="sm"
                       variant="primary"
                       onClick={() => {
                         setModal("Update");
@@ -229,7 +233,7 @@ export default function Users() {
                     >
                       Update User
                     </Button>
-                    <Button
+                    <Button size="sm"
                       variant="danger"
                       style={{ marginLeft: "10px" }}
                       onClick={() => {
@@ -238,6 +242,12 @@ export default function Users() {
                     >
                       Delete User
                     </Button>
+                    <Button size="sm"
+                      variant="danger"
+                      style={{ marginLeft: "10px" }}
+                    >
+                      View Details
+                    </Button>
                   </Card.Body>
                 </Card>
               </Col>
@@ -245,6 +255,19 @@ export default function Users() {
           })}
         </Row>
       </Container>
+
+
+      <Modal show={show1} onHide={handleClose1}>
+        <Modal.Header closeButton>
+          <Modal.Title>Success!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>User {updateModal} sucessfully!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose1}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
