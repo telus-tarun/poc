@@ -10,6 +10,7 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
+import { Link } from "react-router-dom";
 export default function Users() {
   const queryClient = new QueryClient();
   const { isLoading, error, data } = useQuery(["repoData"], async () =>
@@ -242,12 +243,11 @@ export default function Users() {
                     >
                       Delete User
                     </Button>
-                    <Button size="sm"
+                    <Link key={data.id} to={/users/ + data.id}><Button size="sm"
                       variant="danger"
                       style={{ marginLeft: "10px" }}
-                    >
-                      View Details
-                    </Button>
+                    >View Details
+                    </Button></Link>
                   </Card.Body>
                 </Card>
               </Col>
