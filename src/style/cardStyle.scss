@@ -1,0 +1,35 @@
+$danger: #F71717;
+$success : green;
+$primary : #A103FD;    
+.danger {
+  background-color: $danger !important;
+  border-color: $danger !important;
+  margin-left : 10px;
+  box-shadow: none !important;
+}
+.danger:hover{
+    background-color: $danger;
+}
+
+.success {
+    background-color: $success !important;
+    border-color: $success !important;
+    margin-left : 10px;
+    box-shadow: none !important;
+  }
+  .success:hover{
+      background-color: $success;
+  }
+
+  .primary {
+    background-color: $primary !important;
+    border-color: $primary !important;
+    box-shadow: none !important;
+  }
+  .primary:hover{
+      background-color: $primary;
+  }
+
+.heading{
+    text-align: center !important;
+}
